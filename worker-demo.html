@@ -1,0 +1,92 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Worker Demo</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f1f5f9;
+            padding: 30px;
+        }
+
+        main {
+            max-width: 600px;
+            margin: auto;
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+        }
+
+        button {
+            padding: 12px 18px;
+            margin: 5px;
+            border: none;
+            border-radius: 5px;
+            background: #2563eb;
+            color: white;
+            cursor: pointer;
+        }
+
+        #result {
+            margin-top: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <main>
+        <h1>Web Worker Demo</h1>
+
+        <p>A Web Worker performs calculations in the background.</p>
+
+        <button id="runWorker">Run in Worker</button>
+        <button id="stopWorker">Stop Worker</button>
+
+        <p id="result">Waiting for calculation...</p>
+        <p>You can still click and interact with this page while the worker runs.</p>
+    </main>
+
+    <script>
+        let worker;
+
+        // Start the background worker
+        document.getElementById('runWorker').onclick = () => {
+            if (worker) {
+                worker.terminate();
+            }
+
+            worker = new Worker('worker.js');
+
+            document.getElementById('result').textContent =
+                'Calculating in background...';
+
+            worker.onmessage = (e) => {
+                document.getElementById('result').textContent = e.data;
+            };
+
+            worker.onerror = (e) => {
+                document.getElementById('result').textContent =
+                    'Worker error: ' + e.message;
+            };
+
+            worker.postMessage(10000000);
+        };
+
+        // Stop the worker
+        document.getElementById('stopWorker').onclick = () => {
+            if (worker) {
+                worker.terminate();
+                worker = null;
+
+                document.getElementById('result').textContent =
+                    'Worker stopped.';
+            }
+        };
+    </script>
+</body>
+</html>

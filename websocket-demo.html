@@ -1,0 +1,108 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSocket Demo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f1f5f9;
+            padding: 30px;
+        }
+
+        main {
+            max-width: 600px;
+            margin: auto;
+            background: white;
+            padding: 24px;
+            border-radius: 10px;
+        }
+
+        input {
+            padding: 10px;
+            width: 65%;
+        }
+
+        button {
+            padding: 10px 16px;
+            background: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .sent {
+            color: #2563eb;
+        }
+
+        .received {
+            color: #15803d;
+        }
+    </style>
+</head>
+<body>
+
+<main>
+    <h1>WebSocket Demo</h1>
+
+    <p id="status">Connecting...</p>
+
+    <input type="text" id="messageInput"
+        placeholder="Type a message">
+
+    <button id="sendBtn">Send Message</button>
+
+    <h2>Messages</h2>
+    <div id="messages">
+        <p>No messages sent yet.</p>
+    </div>
+</main>
+
+<script>
+    const socket = new WebSocket("wss://ws.postman-echo.com/raw");
+    const status = document.getElementById("status");
+    const messages = document.getElementById("messages");
+    const input = document.getElementById("messageInput");
+    const button = document.getElementById("sendBtn");
+
+    socket.onopen = function () {
+        status.textContent = "Connected to WebSocket server";
+        status.style.color = "green";
+    };
+
+    socket.onmessage = function (event) {
+        const received = document.createElement("p");
+        received.className = "received";
+        received.textContent = "Received: " + event.data;
+        messages.appendChild(received);
+    };
+
+    socket.onerror = function () {
+        status.textContent = "Connection error";
+        status.style.color = "red";
+    };
+
+    socket.onclose = function () {
+        status.textContent = "Connection closed";
+    };
+
+    button.addEventListener("click", function () {
+        const message = input.value.trim();
+
+        if (message !== "" && socket.readyState === WebSocket.OPEN) {
+            const sent = document.createElement("p");
+            sent.className = "sent";
+            sent.textContent = "Sent: " + message;
+            messages.appendChild(sent);
+
+            socket.send(message);
+            input.value = "";
+        }
+    });
+</script>
+
+</body>
+</html>

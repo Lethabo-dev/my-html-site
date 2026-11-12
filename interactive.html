@@ -1,0 +1,133 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File API and Drag and Drop</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+    <header>
+        <h1>HTML5 File API</h1>
+        <p>Select or drag an image to preview it</p>
+    </header>
+
+    <main>
+        <h2>Choose a File</h2>
+
+        <input type="file" id="fileInput">
+
+        <pre id="fileInfo">No file selected</pre>
+
+        <h2>Drag and Drop an Image</h2>
+
+        <div id="dropZone" style="border: 2px dashed #64748b; padding: 40px; text-align: center; border-radius: 8px;">
+            Drag an image here
+        </div>
+
+        <img id="preview" alt="Image Preview" style="max-width: 200px; margin-top: 12px;">
+
+        <h2>HTML5 Video</h2>
+
+<video controls width="320">
+    <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
+    Your browser does not support HTML video.
+</video>
+
+<h2>HTML5 Audio</h2>
+
+<audio controls>
+    <source src="https://www.w3schools.com/html/horse.mp3" type="audio/mpeg">
+    Your browser does not support HTML audio.
+</audio>
+
+<h2>HTML5 Geolocation</h2>
+
+<button id="locBtn">Get my location</button>
+
+<p id="location">Location not requested yet</p>
+
+<script>
+    document.getElementById('locBtn').addEventListener('click', () => {
+        navigator.geolocation.getCurrentPosition(
+            (pos) => {
+                document.getElementById('location').textContent =
+                    `Lat: ${pos.coords.latitude}, Lng: ${pos.coords.longitude}`;
+            },
+            () => {
+                document.getElementById('location').textContent =
+                    'Permission denied or location unavailable';
+            }
+        );
+    });
+</script>
+
+<h2>Browser Context Information</h2>
+
+<pre id="context">Loading browser information...</pre>
+
+<script>
+    // Collect browser and device information
+    const ctx = {
+        online: navigator.onLine,
+        language: navigator.language,
+        mobile: /Mobi|Android/i.test(navigator.userAgent)
+    };
+
+    // Display information on the page
+    document.getElementById('context').textContent =
+        JSON.stringify(ctx, null, 2);
+
+    // Display information in the browser Console
+    console.log('PM-04 debug context:', ctx);
+</script>
+
+    </main>
+
+    <footer>
+        <p>© 2026 Lethabo Magopa. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // File picker
+        document.getElementById('fileInput').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+
+            document.getElementById('fileInfo').textContent =
+                file ? `Name: ${file.name}, Size: ${file.size} bytes` : 'No file selected';
+        });
+
+        // Drag and drop functionality
+        const dropZone = document.getElementById('dropZone');
+        const preview = document.getElementById('preview');
+
+        // Allow dropping files
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+        });
+
+        // Handle dropped image
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+
+            const file = e.dataTransfer.files[0];
+
+            if (!file || !file.type.startsWith('image/')) {
+                return;
+            }
+
+            const reader = new FileReader();
+
+            reader.onload = () => {
+                preview.src = reader.result;
+            };
+
+            reader.readAsDataURL(file);
+        });
+    </script>
+
+</body>
+</html>
+
