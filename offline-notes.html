@@ -50,26 +50,55 @@
     </footer>
 
     <script>
-        // Save note to localStorage
-        document.getElementById('saveBtn').onclick = () => {
-            localStorage.setItem(
-                'offlineNote',
-                document.getElementById('note').value
-            );
+    // Save note locally first, then send it to MongoDB
+    document.getElementById('saveBtn').onclick = async () => {
+        const noteContent = document.getElementById('note').value;
+
+        if (!noteContent.trim()) {
+            document.getElementById('status').textContent =
+                'Please write a note first.';
+            return;
+        }
+
+        // Save immediately in localStorage
+        localStorage.setItem('offlineNote', noteContent);
+
+        document.getElementById('status').textContent =
+            'Saved locally. Syncing to database...';
+
+        // Send note to the backend
+        try {
+            const response = await fetch('/api/notes', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    content: noteContent
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error('Database save failed');
+            }
 
             document.getElementById('status').textContent =
-                'Saved to localStorage';
-        };
-
-        // Load saved note from localStorage
-        document.getElementById('loadBtn').onclick = () => {
-            document.getElementById('note').value =
-                localStorage.getItem('offlineNote') || '';
-
+                'Saved locally and to MongoDB!';
+        } catch (error) {
             document.getElementById('status').textContent =
-                'Loaded from localStorage';
-        };
-    </script>
+                'Saved locally. Database sync failed.';
+        }
+    };
+
+    // Load saved note from localStorage
+    document.getElementById('loadBtn').onclick = () => {
+        document.getElementById('note').value =
+            localStorage.getItem('offlineNote') || '';
+
+        document.getElementById('status').textContent =
+            'Loaded from localStorage';
+    };
+</script>
 
 </body>
 </html>
